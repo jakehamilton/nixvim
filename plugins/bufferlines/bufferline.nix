@@ -23,7 +23,6 @@ with lib; let
   highlightOptions = {
     fill = "fill";
     background = "background";
-
     tab = "tab";
     tab_selected = "tabSelected";
     tab_separator = "tabSeparator";
@@ -33,7 +32,6 @@ with lib; let
     close_button = "closeButton";
     close_button_visible = "closeButtonVisible";
     close_button_selected = "closeButtonSelected";
-
     buffer_visible = "bufferVisible";
     buffer_selected = "bufferSelected";
 
@@ -56,7 +54,6 @@ with lib; let
     info = "info";
     info_visible = "infoVisible";
     info_selected = "infoSelected";
-
     info_diagnostic = "infoDiagnostic";
     info_diagnostic_visible = "infoDiagnosticVisible";
     info_diagnostic_selected = "infoDiagnosticSelected";
@@ -64,7 +61,6 @@ with lib; let
     warning = "warning";
     warning_visible = "warningVisible";
     warning_selected = "warningSelected";
-
     warning_diagnostic = "warningDiagnostic";
     warning_diagnostic_visible = "warningDiagnosticVisible";
     warning_diagnostic_selected = "warningDiagnosticSelected";
@@ -72,7 +68,6 @@ with lib; let
     error = "error";
     error_visible = "errorVisible";
     error_selected = "errorSelected";
-
     error_diagnostic = "errorDiagnostic";
     error_diagnostic_visible = "errorDiagnosticVisible";
     error_diagnostic_selected = "errorDiagnosticSelected";
@@ -81,24 +76,24 @@ with lib; let
     modified_visible = "modifiedVisible";
     modified_selected = "modifiedSelected";
 
-    duplicate = "duplicate";
-    duplicate_visible = "duplicateVisible";
     duplicate_selected = "duplicateSelected";
+    duplicate_visible = "duplicateVisible";
+    duplicate = "duplicate";
 
-    separator = "separator";
-    separator_visible = "separatorVisible";
     separator_selected = "separatorSelected";
+    separator_visible = "separatorVisible";
+    separator = "separator";
 
     indicator_visible = "indicatorVisible";
     indicator_selected = "indicatorSelected";
 
-    pick = "pick";
-    pick_visible = "pickVisible";
-    pick_selected = "pickSelected";
-
     offset_separator = "offsetSeparator";
 
     trunc_marker = "trunkMarker";
+
+    pick = "pick";
+    pick_visible = "pickVisible";
+    pick_selected = "pickSelected";
   };
 in {
   options = {
