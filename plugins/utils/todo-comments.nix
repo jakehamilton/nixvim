@@ -260,6 +260,7 @@ in {
   in
     mkIf cfg.enable {
       extraPlugins = [cfg.package];
+      extraPackages = [pkgs.ripgrep];
       extraConfigLua = ''
         require("todo-comments").setup${helpers.toLuaObject setupOptions}
       '';

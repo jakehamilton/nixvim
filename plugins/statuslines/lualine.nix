@@ -67,6 +67,10 @@ with lib; let
               "1"
               "Adds padding to the left and right of components.";
 
+            fmt = helpers.mkNullOrOption helpers.rawType ''
+              A lua function to format the component string.
+            '';
+
             extraConfig = mkOption {
               type = types.attrs;
               default = {};
@@ -207,11 +211,12 @@ in {
       color,
       padding,
       extraConfig,
+      fmt,
     }:
       mergeAttrs
       {
         "__unkeyed" = name;
-        inherit icons_enabled icon separator color padding;
+        inherit icons_enabled icon separator color padding fmt;
       }
       extraConfig;
     processSections = mapAttrs (_: mapNullable (map processComponent));

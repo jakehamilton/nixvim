@@ -117,6 +117,7 @@
     ./utils/multicursors.nix
     ./utils/navbuddy.nix
     ./utils/neorg.nix
+    ./utils/neoscroll.nix
     ./utils/neogen.nix
     ./utils/notify.nix
     ./utils/netman.nix

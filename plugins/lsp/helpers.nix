@@ -56,6 +56,12 @@
                 else null;
             };
 
+            capabilities = mkOption {
+              type = types.nullOr (types.attrsOf types.bool);
+              description = "Control resolved capabilities for the language server.";
+              default = null;
+            };
+
             filetypes = helpers.mkNullOrOption (types.listOf types.str) ''
               Set of filetypes for which to attempt to resolve {root_dir}.
               May be empty, or server may specify a default value.
@@ -126,6 +132,7 @@
           plugins.lsp.enabledServers = [
             {
               name = serverName;
+              capabilities = cfg.capabilities;
               extraOptions =
                 {
                   inherit (cfg) cmd filetypes autostart;
