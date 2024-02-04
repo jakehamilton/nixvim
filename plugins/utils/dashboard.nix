@@ -60,13 +60,13 @@ in {
 
       header = mkOption {
         description = "Header text";
-        type = types.nullOr (types.either (types.listOf types.str) helpers.rawType);
+        type = types.nullOr (types.either (types.listOf types.str) helpers.nixvimTypes.rawLua);
         default = null;
       };
 
       footer = mkOption {
         description = "Footer text";
-        type = types.nullOr (types.either (types.listOf types.str) helpers.rawType);
+        type = types.nullOr (types.either (types.listOf types.str) helpers.nixvimTypes.rawLua);
         default = null;
       };
 

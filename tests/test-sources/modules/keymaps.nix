@@ -27,7 +27,7 @@
           action = "<cmd>echo \"test\"<cr>";
         }
         {
-          # raw action using rawType
+          # raw action using `nixvimTypes.rawLua`
           key = "<C-p>";
           action.__raw = "function() print('hello') end";
         }

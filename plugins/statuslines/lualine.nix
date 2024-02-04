@@ -80,7 +80,7 @@ with lib; let
               "1"
               "Adds padding to the left and right of components.";
 
-            fmt = helpers.mkNullOrOption helpers.rawType ''
+            fmt = helpers.mkNullOrOption helpers.nixvimTypes.rawLua ''
               A lua function to format the component string.
             '';
 
