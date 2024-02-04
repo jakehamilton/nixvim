@@ -2,14 +2,14 @@
   pkgs,
   config,
   lib,
+  helpers,
   ...
 }:
 with lib; let
   cfg = config.plugins.neoscroll;
-  helpers = import ../helpers.nix {inherit lib;};
 in {
   options.plugins.neoscroll =
-    helpers.extraOptionsOptions
+    helpers.neovim-plugin.extraOptionsOptions
     // {
       enable = mkEnableOption "neoscroll";
 
