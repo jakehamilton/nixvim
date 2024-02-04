@@ -1,11 +1,11 @@
 {
   lib,
-  pkgs,
+  helpers,
   config,
+  pkgs,
   ...
-} @ args:
+}:
 with lib; let
-  helpers = import ../helpers.nix args;
   basePluginPath = ["plugins" "indent-blankline"];
 in {
   # TODO: Those warnings were introduced on 2023/10/17.
@@ -75,7 +75,7 @@ in {
     );
 
   options.plugins.indent-blankline =
-    helpers.extraOptionsOptions
+    helpers.neovim-plugin.extraOptionsOptions
     // {
       enable = mkEnableOption "indent-blankline.nvim";
 

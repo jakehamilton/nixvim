@@ -1,19 +1,12 @@
 {
-  pkgs,
-  config,
   lib,
+  helpers,
+  config,
+  pkgs,
   ...
 }:
 with lib; let
   cfg = config.plugins.wilder;
-  helpers = import ../helpers.nix {inherit lib;};
-
-  boolToInt = value:
-    if value == null
-    then null
-    else if value
-    then "1"
-    else "0";
 
   mkKeyOption = default: desc:
     helpers.defaultNullOpts.mkNullable
@@ -65,7 +58,7 @@ in {
   ];
 
   options.plugins.wilder =
-    helpers.extraOptionsOptions
+    helpers.neovim-plugin.extraOptionsOptions
     // {
       enable = mkEnableOption "wilder-nvim";
 
@@ -158,7 +151,7 @@ in {
         Setting the option after the first run has no effect.
       '';
 
-      pipeline = helpers.mkNullOrOption (with types; listOf str) ''
+      pipeline = helpers.mkNullOrOption (with helpers.nixvimTypes; listOf strLua) ''
         Sets the pipeline to use to get completions.
         See `|wilder-pipeline|`.
 
@@ -182,7 +175,7 @@ in {
         ```
       '';
 
-      render = helpers.mkNullOrOption types.str ''
+      renderer = helpers.defaultNullOpts.mkLuaFn "nil" ''
         Sets the renderer to used to display the completions.
         See `|wilder-renderer|`.
 
@@ -197,7 +190,7 @@ in {
         ```
       '';
 
-      preHook = helpers.mkNullOrOption types.str ''
+      preHook = helpers.defaultNullOpts.mkLuaFn "nil" ''
         A function which takes a `ctx`.
         This function is called when wilder starts, or when wilder becomes unhidden.
         See `|wilder-hidden|`.
@@ -205,7 +198,7 @@ in {
         `ctx` contains no keys.
       '';
 
-      postHook = helpers.mkNullOrOption types.str ''
+      postHook = helpers.defaultNullOpts.mkLuaFn "nil" ''
         A function which takes a `ctx`.
         This function is called when wilder stops, or when wilder becomes hidden.
         See `|wilder-hidden|`.
@@ -244,15 +237,9 @@ in {
         pipeline =
           helpers.ifNonNull' pipeline
           (map helpers.mkRaw pipeline);
-        render =
-          helpers.ifNonNull' render
-          (helpers.mkRaw render);
-        preHook =
-          helpers.ifNonNull' preHook
-          (helpers.mkRaw preHook);
-        postHook =
-          helpers.ifNonNull' postHook
-          (helpers.mkRaw postHook);
+        inherit renderer;
+        pre_hook = preHook;
+        post_hook = postHook;
       }
       // cfg.extraOptions;
   in

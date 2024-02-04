@@ -1,12 +1,12 @@
 {
+  lib,
+  helpers,
   config,
   pkgs,
-  lib,
   ...
 }:
 with lib; let
   cfg = config.plugins.todo-comments;
-  helpers = import ../helpers.nix {inherit lib;};
 
   commands = {
     todoQuickFix = "TodoQuickFix";
@@ -15,9 +15,16 @@ with lib; let
     todoTelescope = "TodoTelescope";
   };
 in {
+  imports = [
+    (
+      mkRemovedOptionModule
+      ["plugins" "todo-comments" "keymapsSilent"]
+      "Use `plugins.todo-comments.keymaps.<COMMAND>.options.silent`."
+    )
+  ];
   options = {
     plugins.todo-comments =
-      helpers.extraOptionsOptions
+      helpers.neovim-plugin.extraOptionsOptions
       // {
         enable = mkEnableOption "todo-comments";
 
@@ -72,7 +79,7 @@ in {
             ```
           '';
 
-        guiStyle = helpers.mkCompositeOption "The gui style for highlight groups." {
+        guiStyle = {
           fg = helpers.defaultNullOpts.mkStr "NONE" ''
             The gui style to use for the fg highlight group.
           '';
@@ -86,7 +93,7 @@ in {
           When true, custom keywords will be merged with the default
         '';
 
-        highlight = helpers.mkCompositeOption "Highlight options." {
+        highlight = {
           multiline = helpers.defaultNullOpts.mkBool true ''
             Enable multiline todo comments.
           '';
@@ -156,7 +163,7 @@ in {
             ```
           '';
 
-        search = helpers.mkCompositeOption "Search options." {
+        search = {
           command = helpers.defaultNullOpts.mkStr "rg" "Command to use for searching for keywords.";
 
           args = helpers.mkNullOrOption (types.listOf types.str) ''
@@ -182,16 +189,11 @@ in {
           '';
         };
 
-        # Keyboard shortcuts for :Todo* commands
-        keymapsSilent = mkOption {
-          type = types.bool;
-          description = "Whether todo-comments keymaps should be silent.";
-          default = false;
-        };
-
         keymaps = let
           mkKeymapOption = optionName: funcName:
-            helpers.mkCompositeOption "Keymap settings for the `:${funcName}` function." {
+            helpers.mkCompositeOption
+            "Keymap settings for the `:${funcName}` function."
+            {
               key = mkOption {
                 type = types.str;
                 description = "Key for the `${funcName}` function.";
@@ -213,6 +215,8 @@ in {
                 default = null;
                 example = "TODO,FIX";
               };
+
+              options = helpers.keymaps.mapConfigOptions;
             };
         in
           mapAttrs mkKeymapOption commands;
@@ -227,7 +231,7 @@ in {
         inherit (cfg) keywords;
         gui_style = cfg.guiStyle;
         merge_keywords = cfg.mergeKeywords;
-        highlight = helpers.ifNonNull' cfg.highlight {
+        highlight = {
           inherit
             (cfg.highlight)
             multiline
@@ -245,7 +249,7 @@ in {
           max_line_len = cfg.highlight.maxLineLen;
         };
         inherit (cfg) colors;
-        search = helpers.ifNonNull' cfg.search {
+        search = {
           inherit (cfg.search) command args;
           pattern =
             helpers.ifNonNull' cfg.search.pattern
@@ -280,9 +284,12 @@ in {
               (keymap != null)
               {
                 mode = "n";
-                inherit (keymap) key;
+                inherit
+                  (keymap)
+                  key
+                  options
+                  ;
                 action = ":${funcName}${cwd}${keywords}<CR>";
-                options.silent = cfg.keymapsSilent;
               }
           )
           commands

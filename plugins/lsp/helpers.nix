@@ -1,15 +1,9 @@
-{
-  pkgs,
-  config,
-  lib,
-  ...
-}: {
+{pkgs, ...}: {
   mkLsp = {
     name,
     description ? "Enable ${name}.",
     serverName ? name,
     package ? pkgs.${name},
-    extraPackages ? {},
     cmd ? (cfg: null),
     settings ? (cfg: cfg),
     settingsOptions ? {},
@@ -73,7 +67,7 @@
               `:LspStart` (|lspconfig-commands|).
             '';
 
-            rootDir = helpers.mkNullOrOption types.str ''
+            rootDir = helpers.defaultNullOpts.mkLuaFn "nil" ''
               A function (or function handle) which returns the root of the project used to
               determine if lspconfig should launch a new language server, or attach a previously
               launched server when you open a new buffer matching the filetype of the server.
@@ -99,13 +93,6 @@
 
             settings = settingsOptions;
 
-            extraSettings = mkOption {
-              type = types.attrs;
-              description = ''
-                Extra settings for the ${name} language server.
-              '';
-            };
-
             extraOptions = mkOption {
               default = {};
               type = types.attrs;
@@ -115,30 +102,22 @@
           // packageOption;
       };
 
-      config = let
-        extraSettingsOption = options.plugins.lsp.servers.${name}.extraSettings;
-        extraSettingsAreDefined = extraSettingsOption.isDefined;
-      in
+      config =
         mkIf cfg.enable
         {
           extraPackages =
-            (
-              optional
-              (cfg.installLanguageServer && (package != null))
-              cfg.package
-            )
-            ++ (mapAttrsToList (name: _: cfg."${name}Package") extraPackages);
+            optional
+            (cfg.installLanguageServer && (package != null))
+            cfg.package;
 
           plugins.lsp.enabledServers = [
             {
               name = serverName;
-              capabilities = cfg.capabilities;
+              inherit (cfg) capabilities;
               extraOptions =
                 {
                   inherit (cfg) cmd filetypes autostart;
-                  root_dir =
-                    helpers.ifNonNull' cfg.rootDir
-                    (helpers.mkRaw cfg.rootDir);
+                  root_dir = cfg.rootDir;
                   on_attach =
                     helpers.ifNonNull' cfg.onAttach
                     (
@@ -149,25 +128,21 @@
                         end
                       ''
                     );
-                  settings =
-                    (settings cfg.settings)
-                    // (
-                      if extraSettingsAreDefined
-                      then cfg.extraSettings
-                      else {}
-                    );
+                  settings = settings cfg.settings;
                 }
                 // cfg.extraOptions;
             }
           ];
-
-          warnings =
-            optional extraSettingsAreDefined
-            (
-              let
-                optionPrefix = "plugins.lsp.servers.${name}";
-              in "The `${optionPrefix}.extraSettings` option is deprecated in favor of `${optionPrefix}.extraOptions.settings`."
-            );
         };
+      imports = let
+        basePluginPath = ["plugins" "lsp" "servers" name];
+        basePluginPathString = concatStringsSep "." basePluginPath;
+      in [
+        (
+          mkRemovedOptionModule
+          (basePluginPath ++ ["extraSettings"])
+          "You can use `${basePluginPathString}.extraOptions.settings` instead."
+        )
+      ];
     };
 }

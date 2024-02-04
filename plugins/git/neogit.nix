@@ -1,12 +1,12 @@
 {
-  config,
   lib,
+  helpers,
+  config,
   pkgs,
   ...
 }:
 with lib; let
   cfg = config.plugins.neogit;
-  helpers = import ../helpers.nix {inherit lib;};
 
   sectionDefaultsModule = types.submodule {
     options = {
@@ -64,6 +64,11 @@ in {
         type = types.nullOr types.bool;
         default = null;
       };
+
+      graphStyle = helpers.defaultNullOpts.mkEnumFirstDefault ["ascii" "unicode"] ''
+        "ascii"   is the graph the git CLI generates
+        "unicode" is the graph like https://github.com/rbong/vim-flog
+      '';
 
       commitPopup = mkOption {
         description = "Commit popup configuration";
@@ -218,6 +223,7 @@ in {
         disable_builtin_notifications = disableBuiltinNotifications;
         use_magit_keybindings = useMagitKeybindings;
         commit_popup = commitPopup;
+        graph_style = graphStyle;
       };
   in
     mkIf cfg.enable {

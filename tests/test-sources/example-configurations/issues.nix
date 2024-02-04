@@ -28,7 +28,11 @@
       lsp = {
         enable = true;
         servers = {
-          rust-analyzer.enable = true;
+          rust-analyzer = {
+            enable = true;
+            installCargo = true;
+            installRustc = true;
+          };
           rnix-lsp.enable = true;
         };
       };
@@ -59,8 +63,10 @@
   "65" = {
     colorschemes.gruvbox = {
       enable = true;
-      contrastLight = "hard";
-      contrastDark = "hard";
+      settings = {
+        contrast_light = "hard";
+        contrast_dark = "hard";
+      };
     };
 
     options = {
@@ -75,7 +81,11 @@
         enable = true;
         servers = {
           rnix-lsp.enable = true;
-          rust-analyzer.enable = true;
+          rust-analyzer = {
+            enable = true;
+            installCargo = true;
+            installRustc = true;
+          };
           jsonls.enable = true;
         };
       };

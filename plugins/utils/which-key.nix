@@ -1,12 +1,11 @@
 {
+  lib,
+  helpers,
   pkgs,
   config,
-  lib,
   ...
-} @ args:
-with lib; let
-  helpers = import ../helpers.nix args;
-in {
+}:
+with lib; {
   options.plugins.which-key = {
     enable =
       mkEnableOption
@@ -15,7 +14,7 @@ in {
     package = helpers.mkPackageOption "whick-key-nvim" pkgs.vimPlugins.which-key-nvim;
 
     registrations = mkOption {
-      type = with types; attrsOf str;
+      type = with types; attrsOf anything;
       default = {};
       description = "Manually register the description of mappings.";
       example = {

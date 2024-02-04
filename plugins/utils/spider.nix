@@ -1,16 +1,16 @@
 {
-  pkgs,
-  config,
   lib,
+  helpers,
+  config,
+  pkgs,
   ...
 }:
 with lib; let
   pluginName = "spider";
   cfg = config.plugins.${pluginName};
-  helpers = import ../helpers.nix {inherit lib;};
 in {
   options.plugins.${pluginName} =
-    helpers.extraOptionsOptions
+    helpers.neovim-plugin.extraOptionsOptions
     // {
       enable = mkEnableOption pluginName;
 
@@ -38,7 +38,7 @@ in {
             w = "w";
             e = "e";
             b = "b";
-            g = "ge";
+            ge = "ge";
           };
         };
       };
@@ -57,8 +57,7 @@ in {
         motion: key: {
           mode = ["n" "o" "x"];
           inherit key;
-          action = "function() require('spider').motion('${motion}') end";
-          lua = true;
+          action.__raw = "function() require('spider').motion('${motion}') end";
           options = {
             inherit (cfg.keymaps) silent;
             desc = "Spider-${motion}";

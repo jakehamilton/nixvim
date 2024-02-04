@@ -1,15 +1,15 @@
 {
-  pkgs,
-  config,
   lib,
+  helpers,
+  config,
+  pkgs,
   ...
 }:
 with lib; let
   cfg = config.plugins.mark-radar;
-  helpers = import ../helpers.nix {inherit lib;};
 in {
   options.plugins.mark-radar =
-    helpers.extraOptionsOptions
+    helpers.neovim-plugin.extraOptionsOptions
     // {
       enable = mkEnableOption "mark-radar";
 

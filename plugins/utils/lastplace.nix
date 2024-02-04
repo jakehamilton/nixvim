@@ -1,15 +1,15 @@
 {
-  pkgs,
   lib,
+  helpers,
   config,
+  pkgs,
   ...
 }: let
   cfg = config.plugins.lastplace;
-  helpers = import ../helpers.nix {inherit lib;};
 in
   with lib; {
     options.plugins.lastplace =
-      helpers.extraOptionsOptions
+      helpers.neovim-plugin.extraOptionsOptions
       // {
         enable = mkEnableOption "lastplace";
 

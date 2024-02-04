@@ -1,11 +1,11 @@
 {
-  pkgs,
   lib,
+  pkgs,
   ...
 } @ args:
 with lib;
-with import ../helpers.nix {inherit lib;};
-  mkPlugin args {
+with (import ../helpers.nix {inherit lib;}).vim-plugin;
+  mkVimPlugin args {
     name = "ledger";
     description = "ledger language features";
     package = pkgs.vimPlugins.vim-ledger;

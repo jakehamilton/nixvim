@@ -1,12 +1,12 @@
 {
-  pkgs,
   lib,
+  helpers,
   config,
+  pkgs,
   ...
 }:
 with lib; let
   cfg = config.plugins.lspsaga;
-  helpers = import ../helpers.nix {inherit lib;};
 
   mkKeymapOption = default:
     helpers.defaultNullOpts.mkNullable
@@ -46,7 +46,7 @@ in {
 
   options = {
     plugins.lspsaga =
-      helpers.extraOptionsOptions
+      helpers.neovim-plugin.extraOptionsOptions
       // {
         enable = mkEnableOption "lspsaga.nvim";
 

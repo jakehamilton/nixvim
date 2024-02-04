@@ -1,15 +1,15 @@
 {
+  lib,
+  helpers,
   config,
   pkgs,
-  lib,
   ...
 }:
 with lib; let
   cfg = config.plugins.lspkind;
-  helpers = import ../helpers.nix {inherit lib;};
 in {
   options.plugins.lspkind =
-    helpers.extraOptionsOptions
+    helpers.neovim-plugin.extraOptionsOptions
     // {
       enable = mkEnableOption "lspkind.nvim";
 

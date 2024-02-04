@@ -1,12 +1,12 @@
 {
+  lib,
+  helpers,
   config,
   pkgs,
-  lib,
   ...
 }:
 with lib; let
   cfg = config.plugins.intellitab;
-  helpers = import ../helpers.nix {inherit lib;};
 in {
   options = {
     plugins.intellitab = {
@@ -23,8 +23,7 @@ in {
       {
         mode = "i";
         key = "<Tab>";
-        action = "require('intellitab').indent";
-        lua = true;
+        action.__raw = "require('intellitab').indent";
       }
     ];
     plugins.treesitter = {

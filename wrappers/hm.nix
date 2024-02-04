@@ -1,4 +1,7 @@
-modules: {
+{
+  modules,
+  self,
+}: {
   pkgs,
   config,
   lib,
@@ -32,7 +35,14 @@ in {
   config =
     mkIf cfg.enable
     (mkMerge [
-      {home.packages = [cfg.finalPackage];}
+      {
+        home.packages =
+          [
+            cfg.finalPackage
+            cfg.printInitPackage
+          ]
+          ++ (lib.optional cfg.enableMan self.packages.${pkgs.system}.man-docs);
+      }
       (mkIf (!cfg.wrapRc) {
         xdg.configFile = files;
       })

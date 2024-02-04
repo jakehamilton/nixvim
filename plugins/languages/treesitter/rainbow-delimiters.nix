@@ -1,33 +1,13 @@
 {
-  pkgs,
   lib,
+  helpers,
   config,
+  pkgs,
   ...
 }:
-with lib; let
-  helpers = import ../../helpers.nix {inherit lib;};
-in {
-  # TODO those warnings have been added XX/XX/2023
-  # -> Remove them in ~ 1 month (oct. 2023)
-  imports =
-    mapAttrsToList
-    (
-      old: new:
-        mkRenamedOptionModule
-        ["plugins" "treesitter-rainbow" old]
-        ["plugins" "rainbow-delimiters" new]
-    )
-    {
-      enable = "enable";
-      package = "package";
-      strategy = "strategy";
-      query = "query";
-      disable = "blacklist";
-      hlgroups = "highlight";
-    };
-
+with lib; {
   options.plugins.rainbow-delimiters =
-    helpers.extraOptionsOptions
+    helpers.neovim-plugin.extraOptionsOptions
     // {
       enable = mkEnableOption "rainbow-delimiters.nvim";
 
@@ -42,7 +22,7 @@ in {
           with types;
             attrsOf (
               either
-              helpers.rawType
+              helpers.nixvimTypes.rawLua
               (enum ["global" "local" "noop"])
             )
         )
@@ -126,7 +106,7 @@ in {
       log = {
         file =
           helpers.defaultNullOpts.mkNullable
-          (with types; either str helpers.rawType)
+          (with types; either str helpers.nixvimTypes.rawLua)
           ''
             {
               __raw = "vim.fn.stdpath('log') .. '/rainbow-delimiters.log'";
@@ -137,15 +117,11 @@ in {
             (see `|standard-path|`).
           '';
 
-        level =
-          helpers.defaultNullOpts.mkEnum
-          ["debug" "error" "info" "trace" "warn" "off"]
-          "warn"
-          ''
-            Only messages equal to or above this value will be logged.
-            The default is to log warnings or above.
-            See `|log_levels|` for possible values.
-          '';
+        level = helpers.defaultNullOpts.mkLogLevel "warn" ''
+          Only messages equal to or above this value will be logged.
+          The default is to log warnings or above.
+          See `|log_levels|` for possible values.
+        '';
       };
     };
 
@@ -211,10 +187,10 @@ in {
             blacklist
             ;
           log = with log; {
-            inherit file;
-            level =
-              helpers.ifNonNull' level
-              (helpers.mkRaw "vim.log.levels.${strings.toUpper level}");
+            inherit
+              file
+              level
+              ;
           };
         }
         // cfg.extraOptions;

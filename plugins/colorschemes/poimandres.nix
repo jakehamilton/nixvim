@@ -1,16 +1,16 @@
 {
+  lib,
+  helpers,
   pkgs,
   config,
-  lib,
   ...
-} @ args:
+}:
 with lib; let
   cfg = config.colorschemes.poimandres;
-  helpers = import ../helpers.nix args;
 in {
   options = {
     colorschemes.poimandres =
-      helpers.extraOptionsOptions
+      helpers.neovim-plugin.extraOptionsOptions
       // {
         enable = mkEnableOption "poimandres";
 

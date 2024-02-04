@@ -1,12 +1,12 @@
 {
-  pkgs,
-  config,
   lib,
+  helpers,
+  config,
+  pkgs,
   ...
 }:
 with lib; let
   cfg = config.plugins.neogen;
-  helpers = import ../helpers.nix {inherit lib;};
 
   keymapDef = {
     generate = {
@@ -43,7 +43,7 @@ with lib; let
   };
 in {
   options.plugins.neogen =
-    helpers.extraOptionsOptions
+    helpers.neovim-plugin.extraOptionsOptions
     // {
       enable = mkEnableOption "neogen";
 

@@ -1,15 +1,15 @@
 {
-  pkgs,
-  config,
   lib,
+  helpers,
+  config,
+  pkgs,
   ...
 }:
 with lib; let
   cfg = config.plugins.nvim-bqf;
-  helpers = import ../helpers.nix {inherit lib;};
 in {
   options.plugins.nvim-bqf =
-    helpers.extraOptionsOptions
+    helpers.neovim-plugin.extraOptionsOptions
     // {
       enable = mkEnableOption "nvim-bqf";
 
@@ -70,7 +70,7 @@ in {
           Add label of current item buffer at the end of the item line.
         '';
 
-        shouldPreviewCb = helpers.mkNullOrOption types.str ''
+        shouldPreviewCb = helpers.defaultNullOpts.mkLuaFn "nil" ''
           A callback function to decide whether to preview while switching buffer, with
           (bufnr: number, qwinid: number) parameters.
         '';
@@ -135,10 +135,7 @@ in {
           win_vheight = winVheight;
           inherit wrap;
           buf_label = bufLabel;
-          should_preview_cb =
-            if (shouldPreviewCb == null)
-            then null
-            else helpers.mkRaw shouldPreviewCb;
+          should_preview_cb = shouldPreviewCb;
         };
         func_map = cfg.funcMap;
         filter = {

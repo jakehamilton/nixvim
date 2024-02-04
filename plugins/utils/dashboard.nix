@@ -1,6 +1,7 @@
 {
-  config,
   lib,
+  helpers,
+  config,
   pkgs,
   ...
 }:
@@ -249,10 +250,7 @@ in {
       };
 
       preview = {
-        command = cfg.preview.command;
-        file_path = cfg.preview.file;
-        file_height = cfg.preview.height;
-        file_width = cfg.preview.width;
+        inherit (cfg.preview) command file height width;
       };
     };
 

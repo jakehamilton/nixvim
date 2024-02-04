@@ -1,11 +1,11 @@
 {
-  pkgs,
   lib,
+  pkgs,
   ...
 } @ args:
 with lib;
-with import ../helpers.nix {inherit lib;};
-  mkPlugin args {
+with (import ../helpers.nix {inherit lib;}).vim-plugin;
+  mkVimPlugin args {
     name = "magma-nvim";
     description = "magma-nvim";
     package = pkgs.vimPlugins.magma-nvim-goose;
@@ -22,7 +22,7 @@ with import ../helpers.nix {inherit lib;};
 
           Default: "none"
         '';
-        type = types.enum ["none" "uberzug" "kitty"];
+        type = types.enum ["none" "ueberzug" "kitty"];
       };
 
       automaticallyOpenOutput = mkDefaultOpt {

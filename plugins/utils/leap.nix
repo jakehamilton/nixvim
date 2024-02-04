@@ -1,15 +1,15 @@
 {
-  pkgs,
-  config,
   lib,
+  helpers,
+  config,
+  pkgs,
   ...
 }:
 with lib; let
   cfg = config.plugins.leap;
-  helpers = import ../helpers.nix {inherit lib;};
 in {
   options.plugins.leap =
-    helpers.extraOptionsOptions
+    helpers.neovim-plugin.extraOptionsOptions
     // {
       enable = mkEnableOption "leap.nvim";
 

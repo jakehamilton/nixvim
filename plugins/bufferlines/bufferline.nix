@@ -1,24 +1,12 @@
 {
+  lib,
+  helpers,
   config,
   pkgs,
-  lib,
   ...
-} @ args:
+}:
 with lib; let
   cfg = config.plugins.bufferline;
-  helpers = import ../helpers.nix args;
-
-  highlightOption = {
-    fg = helpers.mkNullOrOption types.str "foreground color";
-
-    bg = helpers.mkNullOrOption types.str "background color";
-
-    sp = helpers.mkNullOrOption types.str "sp color";
-
-    bold = helpers.mkNullOrOption types.bool "enable bold";
-
-    italic = helpers.mkNullOrOption types.bool "enable italic";
-  };
 
   highlightOptions = {
     fill = "fill";
@@ -28,77 +16,62 @@ with lib; let
     tab_separator = "tabSeparator";
     tab_separator_selected = "tabSeparatorSelected";
     tab_close = "tabClose";
-
     close_button = "closeButton";
     close_button_visible = "closeButtonVisible";
     close_button_selected = "closeButtonSelected";
     buffer_visible = "bufferVisible";
     buffer_selected = "bufferSelected";
-
     numbers = "numbers";
     numbers_visible = "numbersVisible";
     numbers_selected = "numbersSelected";
-
     diagnostic = "diagnostic";
     diagnostic_visible = "diagnosticVisible";
     diagnostic_selected = "diagnosticSelected";
-
     hint = "hint";
     hint_visible = "hintVisible";
     hint_selected = "hintSelected";
-
     hint_diagnostic = "hintDiagnostic";
     hint_diagnostic_visible = "hintDiagnosticVisible";
     hint_diagnostic_selected = "hintDiagnosticSelected";
-
     info = "info";
     info_visible = "infoVisible";
     info_selected = "infoSelected";
     info_diagnostic = "infoDiagnostic";
     info_diagnostic_visible = "infoDiagnosticVisible";
     info_diagnostic_selected = "infoDiagnosticSelected";
-
     warning = "warning";
     warning_visible = "warningVisible";
     warning_selected = "warningSelected";
     warning_diagnostic = "warningDiagnostic";
     warning_diagnostic_visible = "warningDiagnosticVisible";
     warning_diagnostic_selected = "warningDiagnosticSelected";
-
     error = "error";
     error_visible = "errorVisible";
     error_selected = "errorSelected";
     error_diagnostic = "errorDiagnostic";
     error_diagnostic_visible = "errorDiagnosticVisible";
     error_diagnostic_selected = "errorDiagnosticSelected";
-
     modified = "modified";
     modified_visible = "modifiedVisible";
     modified_selected = "modifiedSelected";
-
     duplicate_selected = "duplicateSelected";
     duplicate_visible = "duplicateVisible";
     duplicate = "duplicate";
-
     separator_selected = "separatorSelected";
     separator_visible = "separatorVisible";
     separator = "separator";
-
     indicator_visible = "indicatorVisible";
     indicator_selected = "indicatorSelected";
-
-    offset_separator = "offsetSeparator";
-
-    trunc_marker = "trunkMarker";
-
-    pick = "pick";
-    pick_visible = "pickVisible";
     pick_selected = "pickSelected";
+    pick_visible = "pickVisible";
+    pick = "pick";
+    offset_separator = "offsetSeparator";
+    trunc_marker = "truncMarker";
   };
 in {
   options = {
     plugins.bufferline =
-      helpers.extraOptionsOptions
+      helpers.neovim-plugin.extraOptionsOptions
       // {
         enable = mkEnableOption "bufferline";
 
@@ -116,7 +89,7 @@ in {
             with types;
               either
               (enum ["none" "ordinal" "buffer_id" "both"])
-              helpers.rawType
+              helpers.nixvimTypes.rawLua
           )
           "none"
           ''
@@ -167,7 +140,7 @@ in {
           "Separator style";
 
         nameFormatter =
-          helpers.defaultNullOpts.mkStr "null"
+          helpers.defaultNullOpts.mkLuaFn "null"
           ''
             A lua function that can be used to modify the buffer's label.
             The argument 'buf' containing a name, path and bufnr is supplied.
@@ -186,7 +159,7 @@ in {
         showBufferCloseIcons = helpers.defaultNullOpts.mkBool true "Show buffer close icons";
 
         getElementIcon =
-          helpers.defaultNullOpts.mkStr "null"
+          helpers.defaultNullOpts.mkLuaFn "null"
           ''
             Lua function returning an element icon.
 
@@ -226,7 +199,7 @@ in {
           (with types; either bool (enum ["nvim_lsp" "coc"])) "false" "diagnostics";
 
         diagnosticsIndicator =
-          helpers.defaultNullOpts.mkStr "null"
+          helpers.defaultNullOpts.mkLuaFn "null"
           "Either `null` or a function that returns the diagnistics indicator.";
 
         diagnosticsUpdateInInsert =
@@ -235,19 +208,19 @@ in {
 
         offsets = helpers.defaultNullOpts.mkNullable (types.listOf types.attrs) "null" "offsets";
 
-        groups = helpers.mkCompositeOption "groups" {
+        groups = {
           items =
             helpers.defaultNullOpts.mkNullable (types.listOf types.attrs) "[]"
             "List of groups.";
 
-          options = helpers.mkCompositeOption "Group options" {
+          options = {
             toggleHiddenOnEnter =
               helpers.defaultNullOpts.mkBool true
               "Re-open hidden groups on bufenter.";
           };
         };
 
-        hover = helpers.mkCompositeOption "Hover" {
+        hover = {
           enabled = mkEnableOption "hover";
 
           reveal = helpers.defaultNullOpts.mkNullable (types.listOf types.str) "[]" "reveal";
@@ -255,12 +228,12 @@ in {
           delay = helpers.defaultNullOpts.mkInt 200 "delay";
         };
 
-        debug = helpers.mkCompositeOption "Debug options" {
+        debug = {
           logging = helpers.defaultNullOpts.mkBool false "Whether to enable logging";
         };
 
         customFilter =
-          helpers.defaultNullOpts.mkStr "null"
+          helpers.defaultNullOpts.mkLuaFn "null"
           ''
             ```
             fun(buf: number, bufnums: number[]): boolean
@@ -270,7 +243,12 @@ in {
         highlights =
           genAttrs
           (attrValues highlightOptions)
-          (name: highlightOption);
+          (
+            name:
+              helpers.mkNullOrOption helpers.nixvimTypes.highlight ''
+                Highlight group definition for ${name}.
+              ''
+          );
       };
   };
 
@@ -294,18 +272,14 @@ in {
           left_trunc_marker = leftTruncMarker;
           right_trunc_marker = rightTruncMarker;
           separator_style = separatorStyle;
-          name_formatter =
-            helpers.ifNonNull' nameFormatter
-            (helpers.mkRaw nameFormatter);
+          name_formatter = nameFormatter;
           truncate_names = truncateNames;
           tab_size = tabSize;
           max_name_length = maxNameLength;
           color_icons = colorIcons;
           show_buffer_icons = showBufferIcons;
           show_buffer_close_icons = showBufferCloseIcons;
-          get_element_icon =
-            helpers.ifNonNull' getElementIcon
-            (helpers.mkRaw getElementIcon);
+          get_element_icon = getElementIcon;
           show_close_icon = showCloseIcon;
           show_tab_indicators = showTabIndicators;
           show_duplicate_prefix = showDuplicatePrefix;
@@ -315,38 +289,35 @@ in {
           max_prefix_length = maxPrefixLength;
           sort_by = sortBy;
           inherit diagnostics;
-          diagnostics_indicator =
-            helpers.ifNonNull' diagnosticsIndicator
-            (helpers.mkRaw diagnosticsIndicator);
+          diagnostics_indicator = diagnosticsIndicator;
           diagnostics_update_in_insert = diagnosticsUpdateInInsert;
           inherit offsets;
-          groups = helpers.ifNonNull' groups {
+          groups = {
             inherit (groups) items;
-            options = helpers.ifNonNull' groups.options {
+            options = {
               toggle_hidden_on_enter = groups.options.toggleHiddenOnEnter;
             };
           };
-          inherit hover;
-          inherit debug;
-          custom_filter =
-            helpers.ifNonNull' customFilter
-            (helpers.mkRaw customFilter);
+          hover = {
+            inherit
+              (hover)
+              enabled
+              reveal
+              delay
+              ;
+          };
+          debug = {
+            inherit (debug) logging;
+          };
+          custom_filter = customFilter;
         }
         // cfg.extraOptions;
 
       highlights =
         mapAttrs
         (
-          pluginOptionName: nixvimOptionName: {
-            inherit
-              (cfg.highlights.${nixvimOptionName})
-              fg
-              bg
-              sp
-              bold
-              italic
-              ;
-          }
+          pluginOptionName: nixvimOptionName:
+            cfg.highlights.${nixvimOptionName}
         )
         highlightOptions;
     };

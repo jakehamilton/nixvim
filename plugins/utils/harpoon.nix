@@ -1,12 +1,12 @@
 {
-  pkgs,
-  config,
   lib,
+  helpers,
+  config,
+  pkgs,
   ...
 }:
 with lib; let
   cfg = config.plugins.harpoon;
-  helpers = import ../helpers.nix {inherit lib;};
 
   projectConfigModule = types.submodule {
     options = {
@@ -21,7 +21,7 @@ with lib; let
   };
 in {
   options.plugins.harpoon =
-    helpers.extraOptionsOptions
+    helpers.neovim-plugin.extraOptionsOptions
     // {
       enable = mkEnableOption "harpoon";
 
@@ -233,7 +233,7 @@ in {
               (key != null)
               {
                 inherit key;
-                action = luaFunc;
+                action.__raw = luaFunc;
               }
           )
           {
@@ -241,7 +241,7 @@ in {
             toggleQuickMenu = "require('harpoon.ui').toggle_quick_menu";
             navNext = "require('harpoon.ui').nav_next";
             navPrev = "require('harpoon.ui').nav_prev";
-            cmdToggleQuickMenu = "require('harpoon.cmd-ui').toggle_quick_menu()";
+            cmdToggleQuickMenu = "require('harpoon.cmd-ui').toggle_quick_menu";
           }
         );
 
@@ -256,7 +256,7 @@ in {
               mapAttrsToList
               (id: key: {
                 inherit key;
-                action = genLuaFunc id;
+                action.__raw = genLuaFunc id;
               })
               mappingsAttrs
             )
@@ -283,7 +283,6 @@ in {
         helpers.keymaps.mkKeymaps
         {
           mode = "n";
-          lua = true;
           options.silent = cfg.keymapsSilent;
         }
         allMappings;

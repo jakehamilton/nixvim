@@ -1,12 +1,12 @@
 {
-  pkgs,
-  config,
   lib,
+  helpers,
+  config,
+  pkgs,
   ...
 }:
 with lib; let
   cfg = config.plugins.dap.extensions.dap-go;
-  helpers = import ../helpers.nix {inherit lib;};
   dapHelpers = import ./dapHelpers.nix {inherit lib;};
 in {
   options.plugins.dap.extensions.dap-go = {
@@ -31,6 +31,8 @@ in {
       '';
 
       args = helpers.mkNullOrOption (types.listOf types.str) "Additional args to pass to dlv.";
+
+      buildFlags = helpers.defaultNullOpts.mkStr "" "Build flags to pass to dlv.";
     };
   };
 
@@ -41,6 +43,7 @@ in {
       delve = with delve; {
         inherit path port args;
         initialize_timeout_sec = initializeTimeoutSec;
+        build_flags = buildFlags;
       };
     };
   in

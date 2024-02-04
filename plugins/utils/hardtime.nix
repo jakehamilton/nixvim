@@ -1,16 +1,16 @@
 {
+  lib,
+  helpers,
   config,
   pkgs,
-  lib,
   ...
 }:
 with lib; let
   cfg = config.plugins.hardtime;
-  helpers = import ../helpers.nix {inherit lib;};
 in {
   options = {
     plugins.hardtime =
-      helpers.extraOptionsOptions
+      helpers.neovim-plugin.extraOptionsOptions
       // {
         enable = mkEnableOption "hardtime";
 
@@ -126,7 +126,7 @@ in {
             options = {
               message = lib.mkOption {
                 description = "Hint message to be displayed.";
-                type = helpers.rawType;
+                type = helpers.nixvimTypes.rawLua;
               };
 
               length = lib.mkOption {

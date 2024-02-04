@@ -1,12 +1,12 @@
 {
-  pkgs,
-  config,
   lib,
+  helpers,
+  config,
+  pkgs,
   ...
 }:
 with lib; let
   cfg = config.plugins.luasnip;
-  helpers = import ../../helpers.nix {inherit lib;};
 in {
   options.plugins.luasnip = {
     enable = mkEnableOption "luasnip";
@@ -60,12 +60,12 @@ in {
                 [
                   str
                   path
-                  helpers.rawType
+                  helpers.nixvimTypes.rawLua
                   (listOf (oneOf
                     [
                       str
                       path
-                      helpers.rawType
+                      helpers.nixvimTypes.rawLua
                     ]))
                 ]);
           };
@@ -122,12 +122,12 @@ in {
                   [
                     str
                     path
-                    helpers.rawType
+                    helpers.nixvimTypes.rawLua
                     (listOf (oneOf
                       [
                         str
                         path
-                        helpers.rawType
+                        helpers.nixvimTypes.rawLua
                       ]))
                   ]
                 )

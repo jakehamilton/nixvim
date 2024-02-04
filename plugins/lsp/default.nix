@@ -1,12 +1,12 @@
 {
+  lib,
+  helpers,
   config,
   pkgs,
-  lib,
   ...
 }:
 with lib; let
   cfg = config.plugins.lsp;
-  helpers = import ../helpers.nix {inherit lib;};
 in {
   imports = [
     ./language-servers
@@ -73,6 +73,8 @@ in {
           ]);
         description = "A list of enabled LSP servers. Don't use this directly.";
         default = [];
+        internal = true;
+        visible = false;
       };
 
       onAttach = mkOption {
@@ -112,26 +114,27 @@ in {
       if wrappers == []
       then s
       else (head wrappers) (runWrappers (tail wrappers) s);
-    updateCapabilities =
-        let
-          servers = builtins.filter
-            (server: server.capabilities != null && server.capabilities != {})
-            cfg.enabledServers;
-        in
-        lib.concatMapStringsSep "\n" (server:
-          let
-            updates = lib.concatMapStringsSep "\n"
+    updateCapabilities = let
+      servers =
+        builtins.filter
+        (server: server.capabilities != null && server.capabilities != {})
+        cfg.enabledServers;
+    in
+      lib.concatMapStringsSep "\n" (
+        server: let
+          updates =
+            lib.concatMapStringsSep "\n"
             (name: ''
               client.server_capabilities.${name} = ${helpers.toLuaObject server.capabilities.${name}}
             '')
-              (builtins.attrNames server.capabilities);
-          in
-        ''
+            (builtins.attrNames server.capabilities);
+        in ''
           if client.name == "${server.name}" then
             ${updates}
           end
         ''
-        ) servers;
+      )
+      servers;
   in
     mkIf cfg.enable {
       extraPlugins = [pkgs.vimPlugins.nvim-lspconfig];
@@ -152,8 +155,7 @@ in {
             in {
               mode = "n";
               inherit key;
-              action = prefix + actionStr;
-              lua = true;
+              action.__raw = prefix + actionStr;
 
               options =
                 {

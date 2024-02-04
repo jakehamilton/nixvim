@@ -1,11 +1,11 @@
 {
-  pkgs,
   lib,
+  helpers,
   config,
+  pkgs,
   ...
 }: let
   cfg = config.plugins.vimtex;
-  helpers = import ../helpers.nix {inherit lib;};
 in
   with lib; {
     options.plugins.vimtex = {
@@ -37,7 +37,7 @@ in
       installTexLive = mkOption {
         type = types.bool;
         description = ''
-                 Whether or not to install TexLive.
+          Whether or not to install TexLive.
           See https://nixos.wiki/wiki/TexLive.
         '';
         default = false;
@@ -69,7 +69,14 @@ in
         extraPlugins = [cfg.package];
 
         extraPackages =
-          basePackages ++ (lib.optionals (hasAttr "${cfg.viewMethod}" viewMethodAndPDFViewerPairs) viewMethodAndPDFViewerPairs."${cfg.viewMethod}");
+          basePackages
+          ++ (
+            optionals
+            (
+              hasAttr "${cfg.viewMethod}" viewMethodAndPDFViewerPairs
+            )
+            viewMethodAndPDFViewerPairs."${cfg.viewMethod}"
+          );
 
         globals = mapAttrs' (name: nameValuePair ("vimtex_" + name)) globals;
       };

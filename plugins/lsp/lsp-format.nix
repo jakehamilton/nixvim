@@ -1,15 +1,15 @@
-{ pkgs
-, lib
-, config
-, ...
+{
+  lib,
+  helpers,
+  config,
+  pkgs,
+  ...
 }:
 with lib; let
   cfg = config.plugins.lsp-format;
-  helpers = import ../helpers.nix { inherit lib; };
-in
-{
+in {
   options.plugins.lsp-format =
-    helpers.extraOptionsOptions
+    helpers.neovim-plugin.extraOptionsOptions
     // {
       enable = mkEnableOption "lsp-format.nvim";
 
@@ -18,49 +18,49 @@ in
       setup = mkOption {
         type = with types;
           attrsOf
-            (submodule {
-              # Allow the user to provide other options
-              freeformType = types.attrs;
+          (submodule {
+            # Allow the user to provide other options
+            freeformType = types.attrs;
 
-              options = {
-                exclude =
-                  helpers.mkNullOrOption (listOf str)
-                    "List of client names to exclude from formatting.";
+            options = {
+              exclude =
+                helpers.mkNullOrOption (listOf str)
+                "List of client names to exclude from formatting.";
 
-                order =
-                  helpers.mkNullOrOption (listOf str)
-                    ''
-                      List of client names. Formatting is requested from clients in the following
-                      order: first all clients that are not in the `order` table, then the remaining
-                      clients in the order as they occur in the `order` table.
-                      (same logic as |vim.lsp.buf.formatting_seq_sync()|).
-                    '';
-
-                sync = helpers.defaultNullOpts.mkBool false ''
-                  Whether to turn on synchronous formatting.
-                  The editor will block until formatting is done.
+              order =
+                helpers.mkNullOrOption (listOf str)
+                ''
+                  List of client names. Formatting is requested from clients in the following
+                  order: first all clients that are not in the `order` table, then the remaining
+                  clients in the order as they occur in the `order` table.
+                  (same logic as |vim.lsp.buf.formatting_seq_sync()|).
                 '';
 
-                force = helpers.defaultNullOpts.mkBool false ''
-                  If true, the format result will always be written to the buffer, even if the
-                  buffer changed.
-                '';
-              };
-            });
+              sync = helpers.defaultNullOpts.mkBool false ''
+                Whether to turn on synchronous formatting.
+                The editor will block until formatting is done.
+              '';
+
+              force = helpers.defaultNullOpts.mkBool false ''
+                If true, the format result will always be written to the buffer, even if the
+                buffer changed.
+              '';
+            };
+          });
         description = "The setup option maps |filetypes| to format options.";
         example = {
           gopls = {
-            exclude = [ "gopls" ];
-            order = [ "gopls" "efm" ];
+            exclude = ["gopls"];
+            order = ["gopls" "efm"];
             sync = true;
             force = true;
           };
         };
-        default = { };
+        default = {};
       };
 
       lspServersToEnable = mkOption {
-        type = with types; either (enum [ "none" "all" ]) (listOf str);
+        type = with types; either (enum ["none" "all"]) (listOf str);
         default = "all";
         description = ''
           Choose the LSP servers for which lsp-format should be enabled.
@@ -80,16 +80,15 @@ in
       };
     };
 
-  config =
-    let
-      setupOptions = cfg.setup // cfg.extraOptions;
-    in
+  config = let
+    setupOptions = cfg.setup // cfg.extraOptions;
+  in
     mkIf cfg.enable {
       warnings = mkIf (!config.plugins.lsp.enable) [
         "You have enabled `plugins.lsp-format` but have `plugins.lsp` disabled."
       ];
 
-      extraPlugins = [ cfg.package ];
+      extraPlugins = [cfg.package];
 
       plugins.lsp = {
         onAttach = mkIf (cfg.lspServersToEnable == "all") ''
@@ -100,15 +99,15 @@ in
           if (isList cfg.lspServersToEnable)
           then
             genAttrs
-              cfg.lspServersToEnable
-              (
-                serverName: {
-                  onAttach.function = ''
-                    require("lsp-format").on_attach(client)
-                  '';
-                }
-              )
-          else { };
+            cfg.lspServersToEnable
+            (
+              serverName: {
+                onAttach.function = ''
+                  require("lsp-format").on_attach(client)
+                '';
+              }
+            )
+          else {};
       };
 
       extraConfigLua = ''

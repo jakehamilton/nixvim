@@ -1,18 +1,18 @@
 {
+  lib,
+  helpers,
   config,
   pkgs,
-  lib,
   ...
 }:
 with lib; let
   cfg = config.plugins.copilot-lua;
-  helpers = import ../helpers.nix {inherit lib;};
 in {
   options = {
     plugins.copilot-lua = let
       keymapOption = helpers.defaultNullOpts.mkNullable (with types; either (enum [false]) str);
     in
-      helpers.extraOptionsOptions
+      helpers.neovim-plugin.extraOptionsOptions
       // {
         enable = mkEnableOption "copilot.lua";
 
@@ -70,7 +70,7 @@ in {
 
         filetypes =
           helpers.defaultNullOpts.mkNullable
-          (with types; attrsOf (either bool helpers.rawType))
+          (with types; attrsOf (either bool helpers.nixvimTypes.rawLua))
           ''
             {
               yaml = false;

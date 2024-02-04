@@ -1,12 +1,11 @@
 {
   lib,
+  helpers,
   config,
   pkgs,
   ...
-} @ args:
-with lib; let
-  helpers = import ../helpers.nix args;
-in {
+}:
+with lib; {
   options.plugins.inc-rename = {
     enable = mkEnableOption "inc-rename, a plugin previewing LSP renaming";
 
@@ -31,7 +30,7 @@ in {
       the type of the external input buffer to use
     '';
 
-    postHook = helpers.defaultNullOpts.mkNullable types.str "null" ''
+    postHook = helpers.defaultNullOpts.mkLuaFn "null" ''
       callback to run after renaming, receives the result table (from LSP handler) as an argument
     '';
   };
@@ -44,7 +43,7 @@ in {
       preview_empty_name = cfg.previewEmptyName;
       show_message = cfg.showMessage;
       input_buffer_type = cfg.inputBufferType;
-      post_hook = helpers.ifNonNull' cfg.postHook (helpers.mkRaw cfg.postHook);
+      post_hook = cfg.postHook;
     };
   in
     mkIf cfg.enable {

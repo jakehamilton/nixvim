@@ -1,12 +1,12 @@
 {
-  pkgs,
-  config,
   lib,
+  helpers,
+  config,
+  pkgs,
   ...
 }:
 with lib; let
   cfg = config.plugins.diffview;
-  helpers = import ../helpers.nix {inherit lib;};
   mkWinConfig = type: width: height: position:
     with helpers.defaultNullOpts; {
       type = mkEnum ["split" "float"] type ''
@@ -49,7 +49,7 @@ with lib; let
     };
 in {
   options.plugins.diffview = with helpers.defaultNullOpts;
-    helpers.extraOptionsOptions
+    helpers.neovim-plugin.extraOptionsOptions
     // {
       enable = mkEnableOption "diffview";
 
