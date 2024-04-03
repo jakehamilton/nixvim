@@ -171,9 +171,6 @@ with lib; let
         package = pkgs.nixpkgs-fmt;
       };
       pint = {};
-      phpcbf = {
-        package = pkgs.phpPackages.phpcbf;
-      };
       prettier = {
         package = pkgs.nodePackages.prettier;
       };

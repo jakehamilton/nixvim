@@ -92,7 +92,6 @@ with lib; let
       ;
     inherit
       (phpPackages)
-      phpcbf
       phan
       phpcs
       phpstan
