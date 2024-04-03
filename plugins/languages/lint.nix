@@ -175,11 +175,6 @@ in {
           Customize the existing linters by overriding some of their properties.
         '';
         example = {
-          phpcs.args = [
-            "-q"
-            "--report=json"
-            "-"
-          ];
         };
       };
 

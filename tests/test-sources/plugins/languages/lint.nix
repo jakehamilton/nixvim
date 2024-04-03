@@ -20,11 +20,6 @@
         terraform = ["tflint"];
       };
       linters = {
-        phpcs.args = [
-          "-q"
-          "--report=json"
-          "-"
-        ];
       };
       customLinters = {
         foo = {

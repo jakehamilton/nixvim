@@ -93,7 +93,6 @@ with lib; let
     inherit
       (phpPackages)
       phan
-      phpcs
       phpstan
       psalm
       ;
